@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Open Me Kuromi 💜</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Arial', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+            overflow: visible;
+            background: #000;
+            touch-action: manipulation;
+            width: 100%;
+            height: auto;
+        }
+
+        /* Gift Box Container */
+        .gift-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            z-index: 1000;
+            transition: all 0.8s;
+        }
+
+        .gift-container.hidden {
+            opacity: 0;
+            transform: scale(0);
+            pointer-events: none;
+        }
+
+        .gift-box {
+            position: relative;
+            cursor: pointer;
+            animation: float 3s ease-in-out infinite;
+            user-select: none;
+        }
+
+        .gift-box:hover .box-top {
+            transform: translateY(-20px) rotate(-5deg);
+        }
+
+        .box-top {
+            width: 200px;
+            height: 80px;
+            background: #cde0f0;
+            border: 4px solid #8db3d9;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .ribbon {
+            width: 40px;
+            height: 100%;
+            background: #5b8ec7;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .bow {
+            width: 80px;
+            height: 40px;
+            background: #5b8ec7;
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50%;
+        }
+
+        .bow::before,
+        .bow::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            background: #5b8ec7;
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .bow::before { left: -30px; }
+        .bow::after { right: -30px; }
+
+        .box-bottom {
+            width: 200px;
+            height: 150px;
+            background: #5b8ec7;
+            border: 4px solid #3d5a8f;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .open-text {
+            color: white;
+            font-size: 32px;
+            margin-top: 40px;
+            text-align: center;
+            animation: pulse 2s infinite;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            user-select: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        /* Pages */
+        .page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: none;
+            justify-content: flex-start;
+            align-items: stretch;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.5s;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            flex-direction: column;
+            padding-top: 40px;
+            touch-action: pan-y;
+        }
+
+        .page.active {
+            display: flex !important;
+            opacity: 1;
+            animation: fadeIn 0.8s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Page 1: Kuromi Tapping */
+        .page1 {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+        }
+
+        .kuromi-container {
+            text-align: center;
+            background: white;
+            padding: 30px 20px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .kuromi-character {
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.1s;
+            user-select: none;
+            animation: bounce 2s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kuromi-character img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .kuromi-character:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        .tap-counter {
+            font-size: 28px;
+            color: #5b8ec7;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .story-text {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.8;
+            margin: 15px 0;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.5s, max-height 0.5s;
+            text-align: center;
+            text-align: justify;
+            text-justify: inter-word;
+        }
+
+        .story-text.show {
+            opacity: 1;
+            max-height: 600px;
+        }
+
+        .story-text p {
+            text-align: center;
+            text-align: justify;
+            text-justify: inter-word;
+        }
+
+        /* Page 2: Kuromi Helper */
+        .page2 {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+        }
+
+        .kuromi-container {
+            text-align: center;
+            background: white;
+            padding: 30px 20px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .kuromi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .item {
+            width: 100%;
+            height: 80px;
+            background: #f0f5fb;
+            border: 3px solid #8db3d9;
+            border-radius: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            transition: all 0.3s;
+            user-select: none;
+            font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Comic Sans MS', 'Arial', sans-serif;
+        }
+
+        .item:hover {
+            transform: scale(1.05);
+            background: #e8f0f8;
+        }
+
+        .item.collected {
+            background: #5b8ec7;
+            transform: scale(0.8);
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        /* Page 3: Kuromi Cooking */
+        .page3 {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+        }
+
+        .kuromi-container {
+            text-align: center;
+            background: white;
+            padding: 30px 20px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .ingredients-area {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .ingredient {
+            width: 100px;
+            height: 100px;
+            background: #f0f5fb;
+            border: 3px solid #8db3d9;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            transition: all 0.3s;
+            user-select: none;
+            font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Comic Sans MS', 'Arial', sans-serif;
+        }
+
+        .ingredient:hover {
+            transform: scale(1.05);
+            background: #e8f0f8;
+        }
+
+        .ingredient:active {
+            transform: scale(0.9) rotate(10deg);
+        }
+
+        .ingredient.added {
+            opacity: 0.3;
+            transform: scale(0.7);
+            cursor: default;
+        }
+
+        .pot {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #e8f0f8 0%, #cde0f0 50%, #b8cfe5 100%);
+            border: 5px solid #8db3d9;
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pot::after {
+            content: '✨';
+            position: absolute;
+            font-size: 30px;
+            animation: sparkle 1s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        /* Page 4: Kuromi Night to Day */
+        .page4 {
+            background: linear-gradient(135deg, #3a4d6c 0%, #4a6a8a 100%);
+            transition: background 2s ease;
+        }
+
+        .page4.day {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 50%, #dde6f0 100%);
+        }
+
+        .kuromi-container,
+        .melody-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 20px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .sky {
+            width: 100%;
+            height: 180px;
+            background: #3a4d6c;
+            border-radius: 20px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+            transition: background 2s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sky.day {
+            background: linear-gradient(135deg, #d9e8f5 0%, #cde0f0 100%);
+        }
+
+        .moon {
+            width: 80px;
+            height: 80px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            position: absolute;
+            top: 30px;
+            right: 50px;
+            box-shadow: 0 0 30px #d0d0d0;
+            transition: all 2s ease;
+        }
+
+        .sun {
+            width: 100px;
+            height: 100px;
+            background: #ffeb3b;
+            border-radius: 50%;
+            position: absolute;
+            top: 50px;
+            left: -150px;
+            box-shadow: 0 0 50px #ffeb3b;
+            transition: all 2s ease;
+        }
+
+        .sun.rise {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: opacity 2s ease;
+        }
+
+        .star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .clouds {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        .clouds.show {
+            opacity: 1;
+        }
+
+        .cloud {
+            position: absolute;
+            width: 100px;
+            height: 40px;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.8;
+        }
+
+        .final-message {
+            font-size: 28px;
+            background: linear-gradient(45deg, #5b8ec7, #8db3d9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+            margin: 20px 0;
+            opacity: 0;
+            transition: opacity 1s ease;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .final-message.show {
+            opacity: 1;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(91, 142, 199, 0.3)); }
+            50% { filter: drop-shadow(0 0 20px rgba(91, 142, 199, 0.5)); }
+        }
+
+        .instruction {
+            font-size: 16px;
+            color: #888;
+            margin: 12px 0;
+            font-style: italic;
+            word-wrap: break-word;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 15px;
+            word-wrap: break-word;
+        }
+
+        h2 {
+            color: #555;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #5b8ec7 0%, #8db3d9 100%);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 15px;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .next-btn.show {
+            display: inline-block;
+            animation: bounceIn 0.5s;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.3);
+        }
+
+        .next-btn:active {
+            transform: translateY(0);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .photo-container {
+            width: 100%;
+            max-width: 400px;
+            height: 280px;
+            margin: 15px auto;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f0f5fb 0%, #e8f0f8 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            color: #5b8ec7;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .photo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hearts-float {
+            position: fixed;
+            pointer-events: none;
+            font-size: 30px;
+            animation: floatUp 3s ease-out;
+            z-index: 9999;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0);
+            }
+            50% {
+                transform: translateY(-100px) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-200px) scale(0.5);
+            }
+        }
+
+        .character-img {
+            width: 150px;
+            height: 150px;
+            margin: 20px auto;
+            object-fit: contain;
+            animation: floatAndWiggle 3s ease-in-out infinite;
+        }
+
+        @keyframes floatAndWiggle {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg); 
+            }
+            25% { 
+                transform: translateY(-10px) rotate(-3deg); 
+            }
+            50% { 
+                transform: translateY(-5px) rotate(3deg); 
+            }
+            75% { 
+                transform: translateY(-12px) rotate(-2deg); 
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 24px;
+                margin-bottom: 12px;
+            }
+
+            .charlie-brown-container,
+            .snoopy-container,
+            .cooking-container,
+            .linus-container,
+            .melody-container {
+                padding: 20px 15px;
+                border-radius: 20px;
+            }
+
+            .charlie-brown-character {
+                width: 180px;
+                height: 180px;
+            }
+
+            .final-message {
+                font-size: 22px;
+            }
+
+            .ingredient {
+                width: 70px;
+                height: 70px;
+                font-size: 35px;
+            }
+
+            .photo-container {
+                max-width: 350px;
+                height: 250px;
+            }
+
+            .sky {
+                height: 150px;
+            }
+
+            .character-img {
+                width: 120px;
+                height: 120px;
+            }
+
+            .instruction {
+                font-size: 16px;
+            }
+
+            .tap-counter {
+                font-size: 20px;
+            }
+
+            .next-btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+                margin-bottom: 10px;
+            }
+
+            .charlie-brown-container,
+            .snoopy-container,
+            .cooking-container,
+            .linus-container,
+            .melody-container {
+                padding: 15px 12px;
+                border-radius: 15px;
+            }
+
+            .charlie-brown-character {
+                width: 150px;
+                height: 150px;
+            }
+
+            .final-message {
+                font-size: 18px;
+            }
+
+            .ingredient {
+                width: 60px;
+                height: 60px;
+                font-size: 30px;
+            }
+
+            .photo-container {
+                max-width: 100%;
+                height: 200px;
+            }
+
+            .sky {
+                height: 120px;
+            }
+
+            .character-img {
+                width: 100px;
+                height: 100px;
+            }
+
+            .instruction {
+                font-size: 14px;
+            }
+
+            .tap-counter {
+                font-size: 18px;
+            }
+
+            .next-btn {
+                padding: 10px 25px;
+                font-size: 14px;
+            }
+
+            .story-text {
+                font-size: 14px;
+            }
+
+            .pot {
+                width: 150px;
+                height: 150px;
+                font-size: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Gift Box Opening Screen -->
+    <div class="gift-container" id="giftContainer">
+        <div class="gift-box" onclick="openGift()">
+            <div class="box-top">
+                <div class="ribbon"></div>
+                <div class="bow"></div>
+            </div>
+            <div class="box-bottom"></div>
+        </div>
+        <div class="open-text">TAP TO OPEN JAM</div>
+    </div>
+
+
+
+    <!-- Page 1: Tap charlie brown -->
+    <div class="page page1" id="page1">
+        <div class="charlie-brown-container">
+            <h1>💜 tap me ssob </h1>
+            <p class="instruction">tap kuromi 10 times to reveal me!</p>
+            <div class="story-text" id="story1">
+                <div class="photo-container">
+                    <div class="photo-placeholder">
+                        <img src="https://i.ibb.co/whLM7wX7/IMG-20260424-081005-0521.jpg" alt="first memory" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
+                <p>yk babe, this was one of the first photos that made my heart secretly choose you (even tho u hate this photo sm hehe) I've always loved how your face speaks for yourself, i easily understand how you feel with just one look. looking back at it feels like one of the best memories I have (this is just one of the reasons how i fell in love w u)</p>
+            </div>
+            <div class="kuromi-character" id="kuromi" onclick="tapKuromi(event)">
+                <img src="https://i.ibb.co/fGLHBV1C/image.png" alt="Kuromi">
+            </div>
+            <div class="tap-counter" id="tapCounter">Taps: 0/10</div>
+            <button class="next-btn" id="next1" onclick="nextPage(2)">Continue →</button>
+        </div>
+    </div>
+
+    <!-- Page 2: Help snoopy -->
+    <div class="page page2" id="page2">
+        <div class="snoopy-container">
+            <h1>💜 help kuromi jammii!!! 💜</h1>
+            <p class="instruction">collect all 6 hearts to complete!</p>
+            <img src="https://i.ibb.co/B75fhw6/image.png" alt="Kuromi" class="character-img">
+            <div class="story-text" id="story2">
+                <div class="photo-container">
+                    <div class="photo-placeholder">
+                        <img src="https://i.ibb.co/XfGmmNdh/Messenger-creation-50-FD5-FB2-2-D15-4-C77-8617-D671315-CF843.jpg" alt="game night" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
+                <p>this was one of our many gala and adventure but it has photos (cause usually wala tayong pics pag gumagala), this is also my favorite walk trip we had kasi we have no sleep, no food, no money and dala-dala lang tiyaga at tiwala kay lord (sana maulit) ✌🏻</p>
+            </div>
+            <div class="kuromi-grid" id="kuromiGrid"></div>
+            <div class="tap-counter" id="itemCounter">Items: 0/6</div>
+            <button class="next-btn" id="next2" onclick="nextPage(3)">Continue →</button>
+        </div>
+    </div>
+
+    <!-- Page 3: Cook with snoopy -->
+    <div class="page page3" id="page3">
+        <div class="cooking-container">
+            <h1>💜 cook w kuromi & jammi the cream-o lover 💜</h1>
+            <p class="instruction">add all the ingredients!!</p>
+            <img src="https://i.ibb.co/6cJcHswK/image.png" alt="Kuromi" class="character-img" style="width: 200px; height: 200px;">
+            <div class="story-text" id="story3">
+                <div class="photo-container">
+                    <div class="photo-placeholder">
+                        <img src="https://i.ibb.co/kVDXCcHn/Messenger-creation-9-F59793-D-8-D8-C-4725-A7-A6-9-F0-C6-EE1-E952.jpg" alt="Kuromi cooking" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
+                <p>I'll always remember how much u love cream-o, to the point na you'll make it your lunch 😭 PERO U GOTTA EAT CORRECLY (puro ka coke breh), kidding aside i always watch you sleep, i enjoy watching u be at peace kasi i know you have your own battles to fight but no matter what it is, i'm here for uuu (isang tawag mo lang on the way na mew 😏)</p>
+            </div>
+            <div class="pot" id="pot">🍳</div>
+            <div class="ingredients-area" id="ingredientsArea"></div>
+            <div class="tap-counter" id="cookCounter">Ingredients: 0/5</div>
+            <button class="next-btn" id="next3" onclick="nextPage(4)">Continue →</button>
+        </div>
+    </div>
+
+    <!-- Page 4: Linus Night to Day -->
+    <div class="page page4" id="page4">
+        <div class="melody-container">
+            <h1>🫶🏻 bring the sunrise for kuromi!! 🫶🏻</h1>
+            <p class="instruction">tap mo sky master mwehehe</p>
+            <div class="sky" id="sky" onclick="turnToDay()">
+                <div class="stars" id="stars"></div>
+                <div class="moon" id="moon"></div>
+                <div class="sun" id="sun"></div>
+                <div class="clouds" id="clouds"></div>
+            </div>
+            <img src="https://i.ibb.co/hxq1R0LD/image.png" alt="Kuromi" class="character-img">
+            <div class="photo-container">
+                <div class="photo-placeholder">
+                    <img src="https://i.ibb.co/zhHTzvmn/Screenshot-2026-06-09-04-38-19-73-99c04817c0de5652397fc8b56c3b3817.jpg" alt="Kuromi" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+            </div>
+            <div class="story-text show">
+                <p>you're the first person i've met na matindi ang mood swing but i love that about you, and i know there's so much things i still don't know about you so please let me go in your heart & get to know the real you! i care for you a lot kahit na lagi kita na ba-badtrip, and i adore you so so much! labyow to the moon and back master!!!!</p>
+            </div>
+            <div class="final-message" id="finalMessage">
+                dear jammi my favorite vet, happy 2nd Monthsary and this may be late but may i be your boyfriend (⁠◍⁠•⁠ᴗ⁠•⁠◍⁠)⁠✧⁠*⁠。
+            </div>
+            <p style="font-size: 14px; color: #888; font-style: italic; margin-top: 15px;"> I'm grateful for you. 🌸✨</p>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 0;
+        let tapCount = 0;
+        let bonesCollected = 0;
+        let ingredientsAdded = 0;
+        let dayRevealed = false;
+
+        console.log('Script loaded successfully');
+
+        function openGift() {
+            console.log('Opening gift...');
+            const container = document.getElementById('giftContainer');
+            container.classList.add('hidden');
+            
+            setTimeout(() => {
+                container.style.display = 'none';
+                showPage(1);
+            }, 800);
+        }
+
+        function showPage(pageNum) {
+            console.log('Showing page:', pageNum);
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(p => {
+                p.classList.remove('active');
+                p.style.display = 'none';
+            });
+            
+            const targetPage = document.getElementById(`page${pageNum}`);
+            if (targetPage) {
+                targetPage.style.display = 'flex';
+                setTimeout(() => {
+                    targetPage.classList.add('active');
+                }, 10);
+                currentPage = pageNum;
+
+                if (pageNum === 2) initKuromi();
+                if (pageNum === 3) initCooking();
+                if (pageNum === 4) initKuromi2();
+            } else {
+                console.error('Page not found:', pageNum);
+            }
+        }
+
+        function nextPage(pageNum) {
+            console.log('Next page:', pageNum);
+            showPage(pageNum);
+        }
+
+        // Page 1: Charlie brown Tapping
+        function tapKuromi (event) {
+            if (tapCount >= 10) return;
+            
+            tapCount++;
+            const counter = document.getElementById('tapCounter');
+            if (counter) counter.textContent = `Taps: ${tapCount}/10`;
+            
+            const kuromi = document.getElementById('kuromi');
+            if (kuromi) {
+                kuromi.style.transform = `scale(${0.95 + Math.random() * 0.1}) rotate(${Math.random() * 20 - 10}deg)`;
+                setTimeout(() => {
+                    kuromi.style.transform = '';
+                }, 100);
+            }
+
+            // Create floating heart
+            let x, y;
+            if (event.clientX) {
+                x = event.clientX;
+                y = event.clientY;
+            } else if (event.touches && event.touches[0]) {
+                x = event.touches[0].clientX;
+                y = event.touches[0].clientY;
+            } else {
+                x = window.innerWidth / 2;
+                y = window.innerHeight / 2;
+            }
+            createFloatingHeart(x, y);
+
+            if (tapCount === 10) {
+                setTimeout(() => {
+                    const story = document.getElementById('story1');
+                    if (story) story.classList.add('show');
+                    setTimeout(() => {
+                        const btn = document.getElementById('next1');
+                        if (btn) btn.classList.add('show');
+                    }, 300);
+                }, 500);
+            }
+        }
+
+        // Page 2: Kuromi Items
+        function initKuromi() {
+            console.log('Initializing Kuromi page');
+            const grid = document.getElementById('kuromiGrid');
+            if (!grid) {
+                console.error('Items grid not found');
+                return;
+            }
+            
+            grid.innerHTML = '';
+            bonesCollected = 0;
+            const counter = document.getElementById('itemCounter');
+            if (counter) counter.textContent = 'Items: 0/6';
+            
+            for (let i = 0; i < 6; i++) {
+                const item = document.createElement('div');
+                item.className = 'item';
+                item.textContent = '💙';
+                item.onclick = function() {
+                    if (!this.classList.contains('collected')) {
+                        this.classList.add('collected');
+                        bonesCollected++;
+                        console.log('Items collected:', bonesCollected);
+                        if (counter) counter.textContent = `Items: ${bonesCollected}/6`;
+                        
+                        if (bonesCollected === 6) {
+                            setTimeout(() => {
+                                const story = document.getElementById('story2');
+                                if (story) story.classList.add('show');
+                                setTimeout(() => {
+                                    const btn = document.getElementById('next2');
+                                    if (btn) btn.classList.add('show');
+                                }, 300);
+                            }, 500);
+                        }
+                    }
+                };
+                grid.appendChild(item);
+            }
+            console.log('Kuromi initialized with 6 items');
+        }
+
+        // Page 3: Cooking
+        function initCooking() {
+            console.log('Initializing Cooking page');
+            const ingredientsArea = document.getElementById('ingredientsArea');
+            if (!ingredientsArea) {
+                console.error('Ingredients area not found');
+                return;
+            }
+            
+            ingredientsArea.innerHTML = '';
+            ingredientsAdded = 0;
+            const counter = document.getElementById('cookCounter');
+            if (counter) counter.textContent = 'Ingredients: 0/5';
+            
+            const ingredients = ['🥚', '🧈', '🥛', '🍓', '🍯'];
+            
+            ingredients.forEach(emoji => {
+                const ingredient = document.createElement('div');
+                ingredient.className = 'ingredient';
+                ingredient.textContent = emoji;
+                ingredient.onclick = function() {
+                    if (!this.classList.contains('added')) {
+                        this.classList.add('added');
+                        ingredientsAdded++;
+                        console.log('Ingredients added:', ingredientsAdded);
+                        if (counter) counter.textContent = `Ingredients: ${ingredientsAdded}/5`;
+                        
+                        if (ingredientsAdded === 5) {
+                            setTimeout(() => {
+                                const story = document.getElementById('story3');
+                                if (story) story.classList.add('show');
+                                setTimeout(() => {
+                                    const btn = document.getElementById('next3');
+                                    if (btn) btn.classList.add('show');
+                                }, 300);
+                            }, 500);
+                        }
+                    }
+                };
+                ingredientsArea.appendChild(ingredient);
+            });
+            console.log('Cooking initialized with 5 ingredients');
+        }
+
+        // Page 4: Kuromi Night to Day
+        function initKuromi2() {
+            console.log('Initializing Kuromi page');
+            const stars = document.getElementById('stars');
+            if (!stars) {
+                console.error('Stars container not found');
+                return;
+            }
+            
+            stars.innerHTML = '';
+            
+            for (let i = 0; i < 30; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                stars.appendChild(star);
+            }
+
+            const clouds = document.getElementById('clouds');
+            if (clouds) {
+                clouds.innerHTML = '';
+                for (let i = 0; i < 3; i++) {
+                    const cloud = document.createElement('div');
+                    cloud.className = 'cloud';
+                    cloud.style.left = (Math.random() * 70) + '%';
+                    cloud.style.top = (Math.random() * 60) + '%';
+                    clouds.appendChild(cloud);
+                }
+            }
+            console.log('Kuromi initialized');
+        }
+
+        function turnToDay() {
+            console.log('Turning night to day...');
+            if (dayRevealed) {
+                console.log('Already revealed');
+                return;
+            }
+            
+            dayRevealed = true;
+            const page4 = document.getElementById('page4');
+            const sky = document.getElementById('sky');
+            const sun = document.getElementById('sun');
+            const moon = document.getElementById('moon');
+            const stars = document.getElementById('stars');
+            const clouds = document.getElementById('clouds');
+            const finalMessage = document.getElementById('finalMessage');
+            
+            if (page4) page4.classList.add('day');
+            if (sky) sky.classList.add('day');
+            if (sun) sun.classList.add('rise');
+            if (moon) moon.style.opacity = '0';
+            if (stars) stars.style.opacity = '0';
+            if (clouds) clouds.classList.add('show');
+            
+            setTimeout(() => {
+                if (finalMessage) {
+                    finalMessage.classList.add('show');
+                    console.log('Final message revealed');
+                }
+            }, 2000);
+        }
+
+        function createFloatingHeart(x, y) {
+            const heart = document.createElement('div');
+            heart.className = 'hearts-float';
+            heart.textContent = '💗';
+            heart.style.left = x + 'px';
+            heart.style.top = y + 'px';
+            document.body.appendChild(heart);
+            
+            setTimeout(() => {
+                if (heart && heart.parentNode) {
+                    heart.parentNode.removeChild(heart);
+                }
+            }, 3000);
+        }
+
+        // Prevent scrolling on body when pages are active
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded');
+            
+            // Enable scrolling for all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.style.webkitOverflowScrolling = 'touch';
+                
+                // Handle touch scrolling on mobile
+                let isScrolling = false;
+                page.addEventListener('touchstart', function(e) {
+                    isScrolling = true;
+                }, false);
+                
+                page.addEventListener('touchend', function(e) {
+                    isScrolling = false;
+                }, false);
+            });
+            
+            // Verify all pages exist
+            for (let i = 1; i <= 4; i++) {
+                const page = document.getElementById(`page${i}`);
+                console.log(`Page ${i}:`, page ? 'Found' : 'NOT FOUND');
+            }
+            
+            // Add touch support for kuromi
+            const kuromi = document.getElementById('kuromi');
+            if (kuromi) {
+                console.log('kuromi element found, adding touch support');
+                kuromi.addEventListener('touchend', function(e) {
+                    tapKuromi(e);
+                }, { passive: true });
+            } else {
+                console.error('kuromi element not found');
+            }
+            
+            // Add touch support for sky
+            const sky = document.getElementById('sky');
+            if (sky) {
+                console.log('Sky element found, adding touch support');
+                sky.addEventListener('touchend', function(e) {
+                    turnToDay();
+                }, { passive: true });
+            }
+            
+            // Add touch support for gift box
+            const giftBox = document.querySelector('.gift-box');
+            if (giftBox) {
+                giftBox.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    openGift();
+                }, { passive: false });
+            }
+        });
+    </script>
+</body>
+</html>
